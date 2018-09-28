@@ -1,41 +1,50 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
-#Data Preprocessing£º
+
+
+
 import gc
 import numpy as np
-import tensorflow as tf
 import datetime 
 import linecache
-#Chromosome sequence number
-#File name of the WGBS data to be read
-#File name of the base data to be read
-#Output file directory
 
-number = 1 #the number of Chromosome
-wgbs_name = 'GSM432685_H1_WGBS-chr%d.txt' % number
-chr_name = 'chr%d.fa' % number
-seq_out_name = "/xxx/Seq-num%d.fa" % number #where you want to save the after-preprocessed data 
 
-#Read WGBS data
-unames = ['location' , 'methvalue']
-wgbs = pd.read_table(wgbs_name , sep='\t' , header = None , names = unames)
-f = open(wgbs_name ,'r')
-lineNum = 0
-lineNum = len(f.readlines()) 
-f.close()
-#Create a list to store the sequence
-all_seq = []
-seq = ""
-#Timing begins
-  
-starttime = datetime.datetime.now()   
 
+
+
+
+#Data Preprocessing£º  
+#starttime = datetime.datetime.now()   
 #Read the 400bp sequence upstream and downstream of each cg site and store it in wgbs['seq']
 #################################################
-bp = 200
-i = 0
-fl=open(seq_out_name , 'w')
-while i < lineNum:
+
+
+def convertSeqToArray(Seq_charnum):
+ '''
+ 
+ Chromosome sequence number
+ File name of the DNA sequences data to be read = file_in_name
+ File name of the encoded array  data to be read = file_out_name
+ 
+  '''
+  
+ #Parameter Setting
+ bp = 200
+ i = 0
+ fl=open(seq_out_name , 'w')
+ number = 1 #the number of Chromosome changed add one column for '1'
+ wgbs_name = 'GSM432685_H1_WGBS-chr%d.txt' % number
+ chr_name = 'chr%d.fa' % number
+ seq_out_name = "/xxx/Seq-num%d.fa" % number #where you want to save the after-preprocessed data 
+ unames = ['location' , 'methvalue']
+ wgbs = pd.read_table(wgbs_name , sep='\t' , header = None , names = unames)
+ f = open(wgbs_name ,'r')
+ lineNum = 0
+ lineNum = len(f.readlines()) 
+ f.close()
+ #Create a list to store the sequence
+ all_seq = []
+ seq = ""
+ #Timing begins
+ while i < lineNum:
     
     numline = np.divide(wgbs['location'][i] , 50) + 2
     count = linecache.getline(chr_name , numline)
@@ -76,28 +85,28 @@ while i < lineNum:
     seq = ''.join(str_list)
     seq = seq.replace("N","0")
     seq = seq.replace("a","1")
-    seq = seq.replace("A","1")#[0,0,0,1]
+    seq = seq.replace("A","1")
     seq = seq.replace("t","4")
-    seq = seq.replace("T","4")#[1,0,0,0]
+    seq = seq.replace("T","4")
     seq = seq.replace("c","3")
-    seq = seq.replace("C","3")#[0,1,0,0]
+    seq = seq.replace("C","3")
     seq = seq.replace("g","2")
-    seq = seq.replace("G","2")#[0,0,1,0]
+    seq = seq.replace("G","2")
     seq = "".join(list(seq))
     all_seq.append(seq)
     fl.write(all_seq[i])
     fl.write("\n")
     i = i+1
-fl.close()
-#End of time
-endtime = datetime.datetime.now()   
-print (endtime - starttime).seconds
+ fl.close()
+ #End of time
+ #endtime = datetime.datetime.now()   
+ #print (endtime - starttime).seconds
 
-#Optional operation£ºIf the computer is out of memory, you can split the original data
-LIMIT = 200000;
-file_cout = 0;
-url_list = [];
-with open("Seq_charnum.fa") as f:
+ #Optional operation£ºIf the computer is out of memory, you can split the original data
+ LIMIT = 200000;
+ file_cout = 0;
+ url_list = [];
+ with open("Seq_charnum.fa") as f:
 	for line in f:
 		url_list.append(line)
 		if len(url_list) < LIMIT:
@@ -114,13 +123,13 @@ with open("Seq_charnum.fa") as f:
 	with open(file_name,"w") as file:
 		for url in url_list:
 			file.write(url)
-print("Done")
+ print("Done")
 
 #produce .npy object
-k = 2
-while(2<=k<=9):
+ k = 2
+ while(2<=k<=9):
  In_name  = '%d.csv' % k
- out_name = '/home/tq/DeepLL/bz_N*N_data/fs_npy/oc%d.npy' % k
+ out_name = 'file_out_name' % k
  seq = []
  with open(In_name) as f:
 	for line in f:
@@ -141,12 +150,15 @@ while(2<=k<=9):
 	 if(seq[i][j] == '4'):
 	  oc[i].append([1,0,0,0])
  del seq
- oc = np.array(oc)
- np.save(out_name,oc) 
- del oc
+ Array = np.array(oc)
+ np.save(out_name,Array) 
+ del Array
  k = k + 1
-f = pd.read_csv("GSM432685_H1_WGBS-chr1.txt",sep="\t",header=None,names=("A","B"))
-LB = f.ix[:,"B"] 
-lb = np.array(LB)
-del LB
+ 
+ 
+ 
+ return Array
+  
+  
+  
 ##################

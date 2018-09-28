@@ -13,6 +13,7 @@ setup(name='MRCNN',
       packages=find_packages(),
       install_requires=['tensorflow-gpu==1.2.0',
                         'scikit-learn',
+						'keras'
                         'scipy',
                         'numpy',
                         'pandas',
